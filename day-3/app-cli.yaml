@@ -1,0 +1,18 @@
+apiVersion: argoproj.io/v1alpha1
+kind: application
+metadata:
+  name: canary-demo
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/AkashKoche/day-3
+    targetRevision: main
+    path: advanced-deployments
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: default
+  syncPolicy:
+    syncOptions:
+    - CreateNamespace=true
+    - Prune=true

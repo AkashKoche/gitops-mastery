@@ -1,0 +1,38 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Rollout
+metadata:
+  name: nginx-canary-demo
+spec:
+  replicas: 4
+  strategy:
+    canary:
+      steps:
+      - setWeight: 20
+      - pause: {duration: 1m}
+      - setWeight: 60
+      - pause: {duration: 30s}
+      - setWeight: 100
+  selector:
+    matchLabels:
+      app: nginx-canary-demo
+  template:
+    metadata:
+      labels:
+        app: nginx-canary-demo
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:1.25-alpine
+        ports:
+        - containerPorts: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-canary-service
+spec:
+  ports:
+  - port: 80
+    targetPort: 80
+  selector:
+    app: nginx-canary-demo
